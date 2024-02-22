@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="Quote.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="main">
+      <div class="leader">
+        <div class="design">
+          <h1 class="heading">Quote Generator</h1>
+          <div class="quote"></div>
+          
+         <div class="button">
+            <button id="nextButton">Next</button>
+            <button id="copy">Copy</button>
+            <button id="speaker">Voice</button>
+            <button id="Share">Share</button>
+         </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      let quotesData;
+      let currentQuoteIndex = 0;
+
+      function fetchJSONData() {
+        fetch("Quote.json")
+          .then((res) => {
+            return res.json();
+          })
+          .then((data) => {
+            quotesData = data;
+            displayQuote();
+          })
+          .catch((error) => {
+            console.error("Unable to fetch data:", error);
+          });
+      }
+
+      function displayQuote() {
+        const quoteContainer = document.querySelector(".quote");
+        const currentQuote = quotesData[currentQuoteIndex];
+        quoteContainer.innerHTML = `${currentQuote.quote} <p>- ${currentQuote.author}</p>`;
+      }
+
+      document.getElementById("nextButton").addEventListener("click", () => {
+        currentQuoteIndex = (currentQuoteIndex + 1) % quotesData.length;
+        displayQuote();
+      });
+
+      let copyText = document.getElementById("copy");
+
+      copyText.addEventListener("click", async function () {
+        let Text = document.querySelector(".quote").innerText;
+        let textdata = await navigator.clipboard.writeText(Text);
+      });
+
+      let convertVoice = document.getElementById("speaker");
+      let quoteText = document.querySelector(".quote");
+      convertVoice.addEventListener("click", () => {
+        let Utterance = new SpeechSynthesisUtterance(`${quoteText.innerText}`);
+        speechSynthesis.speak(Utterance);
+      });
+
+      let shareQuote = document.getElementById('Share')
+
+      shareQuote.addEventListener('click', () => {
+        let facebookUrl = `https://www.facebook.com/${quoteText.innerText}`
+        window.open(facebookUrl, "_blank")
+      })
+
+      fetchJSONData();
+    </script>
+  </body>
+</html>
